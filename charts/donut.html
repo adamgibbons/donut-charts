@@ -89,10 +89,13 @@
 
   var chart = c3.generate({
     data: {
-      rows: store['2014'],
+      rows: store['2013'],
       type : 'donut',
       onmouseover: function (d, i) { console.log("onmouseover", d, i); },
       onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    },
+    transition: {
+        duration: 1000
     },
     donut: {
       title: "Asset Allocation",
