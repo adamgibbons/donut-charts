@@ -32,14 +32,18 @@
     margin-right: .5em;
     display: inline-block;
   }
+  .year {
+    border: 1px solid red;
+    padding: 1em;
+  }
   </style>
 </head>
 
 <body>
-  <menu>
-    <button id="load">Load</button>
-    <button id="unload">Unload</button>
-  </menu>
+  <div class="years">
+    <div class="year" data-load>2014</div>
+    <div class="year" data-load>2015</div>
+  </div>
 
   <div class="chart-container">
     <div id="chart" style="text-align: center;"></div>
@@ -48,35 +52,31 @@
   <script>
 
   var LABELS = [
-    'Lorem ipsum',
-    'Dolor sit',
-    'Amet nominati',
-    'Patrioque eu usu',
-    'Wisi erroribus'
+    'Public Equity',
+    'Private Assets',
+    'Fixed Income',
+    'Cash'
   ]
 
   var chart = c3.generate({
     data: {
-      columns: [
-        ['Allocation 1', 3],
-        ['Allocation 2', 5],
-        ['Allocation 3', 8],
-        ['Allocation 4', 13],
-        ['Allocation 5', 21]
+      rows: [
+        ['foo', 'bar', 'baz'],
+        [3, 2, 1]
       ],
       type : 'donut',
-      onclick: function (d, i) { console.log("onclick", d, i); },
       onmouseover: function (d, i) { console.log("onmouseover", d, i); },
       onmouseout: function (d, i) { console.log("onmouseout", d, i); }
     },
     donut: {
       title: "Asset Allocation",
-      expand: true,
+      expand: false,
       width: 55,
       label: {
-        show: true
+        show: false
       }
     },
+    tooltip: { show: false },
     color: {
       pattern: [
         '#ca0020',
@@ -94,10 +94,6 @@
       width: 500
     }
   });
-
-  function toggle(id) {
-    chart.toggle(id);
-  }
 
   var blocks = d3.select('.chart-container')
     .insert('div', '.chart')
@@ -130,6 +126,22 @@
   // .on('click', function (id) {
   //     chart.toggle(id);
   // });
+
+  // Year click-handlers
+  function loadYear (_, index, element) {
+    // element[index].textContent
+    chart.load({
+      rows: [
+        ['foo', 'bar', 'baz'],
+        [1, 2, 3]
+      ],
+    })
+    // chart.unload({
+    //   ids: ['foo', 'bar', 'baz']
+    // })
+  }
+
+  d3.selectAll('.year').on('click', loadYear)
 
   </script>
 
