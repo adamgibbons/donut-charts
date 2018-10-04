@@ -13,9 +13,6 @@
   * {
     font-family: 'helvetica neue', helvetica;
   }
-  menu {
-    display: none;
-  }
   .legend {
     margin: auto;
     text-align: left;
@@ -32,7 +29,13 @@
     margin-right: .5em;
     display: inline-block;
   }
+  .years {
+    display: block;
+    margin: 2em;
+    text-align: center;
+  }
   .year {
+    display: inline-block;
     border: 1px solid red;
     padding: 1em;
   }
@@ -41,8 +44,11 @@
 
 <body>
   <div class="years">
+    <div class="year" data-load>2013</div>
     <div class="year" data-load>2014</div>
     <div class="year" data-load>2015</div>
+    <div class="year" data-load>2016</div>
+    <div class="year" data-load>2017</div>
   </div>
 
   <div class="chart-container">
@@ -58,12 +64,32 @@
     'Cash'
   ]
 
+  var store = {
+    '2013': [
+      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      [3, 2, 1, .5]
+    ],
+    '2014': [
+      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      [1, 2, 3, 8]
+    ],
+    '2015': [
+      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      [1, 2, 2, 2]
+    ],
+    '2016': [
+      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      [1, .5, 2, 9]
+    ],
+    '2017': [
+      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      [2, 4, 1, 7]
+    ],
+  }
+
   var chart = c3.generate({
     data: {
-      rows: [
-        ['foo', 'bar', 'baz'],
-        [3, 2, 1]
-      ],
+      rows: store['2014'],
       type : 'donut',
       onmouseover: function (d, i) { console.log("onmouseover", d, i); },
       onmouseout: function (d, i) { console.log("onmouseout", d, i); }
@@ -129,16 +155,9 @@
 
   // Year click-handlers
   function loadYear (_, index, element) {
-    // element[index].textContent
-    chart.load({
-      rows: [
-        ['foo', 'bar', 'baz'],
-        [1, 2, 3]
-      ],
-    })
-    // chart.unload({
-    //   ids: ['foo', 'bar', 'baz']
-    // })
+    const year = element[index].textContent
+
+    chart.load({ rows: store[year] })
   }
 
   d3.selectAll('.year').on('click', loadYear)
