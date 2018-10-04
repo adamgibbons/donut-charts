@@ -29,26 +29,64 @@
     margin-right: .5em;
     display: inline-block;
   }
+
   .years {
     display: block;
-    margin: 2em;
+    margin: 3em 0 6em;
     text-align: center;
   }
+
   .year {
     display: inline-block;
-    border: 1px solid red;
+    border: 1px solid #2F5301;
+    background-color: white;
+    color: #2F5301;
+    border-radius: 50%;
     padding: 1em;
+    cursor: pointer;
+    vertical-align: middle;
+    margin: 0 1em;
+    padding: 1em;
+    height: 1em;
+    width: 1em;
+    transition: background-color 0.3s;
+  }
+
+  .year:hover:not(.active) {
+    background-color: #e7ece0;
+  }
+
+  .year.active {
+    background-color: #2F5301;
+  }
+
+  .year span {
+    position: relative;
+    top: 2.5em;
+    left: -.66em;
+    font-weight: 400;
+    font-size: 1.1em;
   }
   </style>
 </head>
 
 <body>
   <div class="years">
-    <div class="year" data-load>2013</div>
-    <div class="year" data-load>2014</div>
-    <div class="year" data-load>2015</div>
-    <div class="year" data-load>2016</div>
-    <div class="year" data-load>2017</div>
+    <div class="year active" data-load>
+      <span>2013</span>
+    </div>
+    <div class="year" data-load>
+      <span>2014</span>
+    </div>
+    <div class="year" data-load>
+      <span>2015</span>
+    </div>
+    <div class="year" data-load>
+      <span>2016</span>
+    </div>
+    <div class="year" data-load>
+      <span>2017</span>
+    </div>
   </div>
 
   <div class="chart-container">
@@ -157,13 +195,19 @@
   // });
 
   // Year click-handlers
+
+  var years = d3.select('.years')
+
   function loadYear (_, index, element) {
-    const year = element[index].textContent
+    const year = element[index].textContent.trim()
 
     chart.load({ rows: store[year] })
+
+    years.selectAll('.year').classed('active', false)
+    d3.select(element[index]).classed('active', true)
   }
 
-  d3.selectAll('.year').on('click', loadYear)
+  years.selectAll('.year').on('click', loadYear)
 
   </script>
 
