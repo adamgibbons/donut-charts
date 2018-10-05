@@ -21,7 +21,9 @@
   .legend {
     margin: auto;
     text-align: left;
-    width: 130px;
+    width: 180px;
+    position: relative;
+    left: 20px;
   }
 
   .legend-block {
@@ -33,6 +35,7 @@
     width: 1em;
     margin-right: .5em;
     display: inline-block;
+    border-radius: 50%;
   }
 
   .years {
@@ -100,42 +103,42 @@
 
   <script>
 
-  var LABELS = [
+  const LABELS = [
     'Public Equity',
     'Private Assets',
     'Fixed Income',
     'Cash'
   ]
 
-  var store = {
+  const store = {
     '2013': [
-      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      ['Public Equity', 'Private Assets', 'Fixed Income', 'Cash'],
       [3, 2, 1, .5]
     ],
     '2014': [
-      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      ['Public Equity', 'Private Assets', 'Fixed Income', 'Cash'],
       [1, 2, 3, 8]
     ],
     '2015': [
-      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      ['Public Equity', 'Private Assets', 'Fixed Income', 'Cash'],
       [1, 2, 2, 2]
     ],
     '2016': [
-      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      ['Public Equity', 'Private Assets', 'Fixed Income', 'Cash'],
       [1, .5, 2, 9]
     ],
     '2017': [
-      ['publicEquity', 'privateAssets', 'fixedIncome', 'cash'],
+      ['Public Equity', 'Private Assets', 'Fixed Income', 'Cash'],
       [2, 4, 1, 7]
     ],
   }
 
-  var chart = c3.generate({
+  const chart = c3.generate({
     data: {
       rows: store['2013'],
-      type : 'donut',
-      onmouseover: function (d, i) { console.log("onmouseover", d, i); },
-      onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+      type : 'donut'
+      // onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+      // onmouseout: function (d, i) { console.log("onmouseout", d, i); }
     },
     transition: {
         duration: 1000
@@ -164,43 +167,67 @@
       height: 320,
       width: 500
     }
-  });
+  })
 
-  var blocks = d3.select('.chart-container')
-    .insert('div', '.chart')
-    .attr('class', 'legend')
-    .selectAll()
-    .data(LABELS)
-  .enter().append('div')
-    .attr('class', 'legend-block')
-    .attr('data-id', function (id) { return id; })
+  const blocks = createBlocks();
 
-  // Legend color
-  blocks.append('span')
-    .attr('class', 'color')
-    .each(function (id) {
-        d3.select(this).style('background-color', chart.color(id));
-    })
-  
-  // Legend label
-  blocks.append('span')
-    .html(function (id) { return id; })
-    .attr('data-id', function (id) { return id; })
-    // .html(function (id) { return id; })
+  const years = d3.select('.years')
 
-  // blocks.on('mouseover', function (id) {
-  //   chart.focus(id);
-  // })
-  // .on('mouseout', function (id) {
-  //     chart.revert();
-  // })
-  // .on('click', function (id) {
-  //     chart.toggle(id);
-  // });
+  years.selectAll('.year').on('click', loadYear)
 
-  // Year click-handlers
+  function add (a, b) {
+    return a + b
+  }
 
-  var years = d3.select('.years')
+  function getPercentageById (id, _, nodeList, year) {
+    const [ids, values] = store[year]
+    const percentage = values[ids.indexOf(id)] / values.reduce(add, 0)
+
+    return `${Math.round(percentage * 100)}% `
+  }
+
+  function createBlocks() {
+    const blocks = d3.select('.chart-container')
+      .insert('div', '.chart')
+      .attr('class', 'legend')
+      .selectAll()
+      .data(LABELS)
+    .enter().append('div')
+      .attr('class', 'legend-block')
+      .attr('data-id', function (id) { return id; })
+
+    // Legend color
+    blocks.append('span')
+      .attr('class', 'color')
+      .each(function (id) {
+          d3.select(this).style('background-color', chart.color(id));
+      })
+
+    blocks.append('span')
+      .attr('data-percentage', function (id) { return id; })
+      .style('font-weight', 900)
+      .html(function (datum, index, nodes) {
+        return getPercentageById(datum, index, nodes, '2013')
+      })
+
+    blocks.append('span')
+      .html(function (id) {
+        return id;
+      })
+      .attr('data-id', function (id) { return id; })
+
+    // blocks.on('mouseover', function (id) {
+    //   chart.focus(id);
+    // })
+    // .on('mouseout', function (id) {
+    //     chart.revert();
+    // })
+    // .on('click', function (id) {
+    //     chart.toggle(id);
+    // });
+
+    return blocks;
+  }
 
   function loadYear (_, index, element) {
     const year = element[index].textContent.trim()
@@ -208,11 +235,13 @@
     chart.load({ rows: store[year] })
 
     years.selectAll('.year').classed('active', false)
+
     d3.select(element[index]).classed('active', true)
+
+    blocks.selectAll('[data-percentage]').html(function (datum, index, nodes) {
+      return getPercentageById.call(nodes[index], datum, index, nodes, year)
+    })
   }
-
-  years.selectAll('.year').on('click', loadYear)
-
   </script>
 
 
